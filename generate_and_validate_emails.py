@@ -1,5 +1,6 @@
 import json
 import requests
+import time
 
 # Function to send a GET request to AbstractAPI for email validation
 def send_email_validation_request(email_address, api_key):
@@ -56,6 +57,7 @@ def generate_email_variations(first_name, last_name, company_domain):
 
     return list(email_variations)
 
+
 # Main code block
 if __name__ == "__main__":
     api_key = "YOUR_API_KEY_HERE"  # Replace with your actual API key
@@ -72,6 +74,8 @@ if __name__ == "__main__":
         api_response = send_email_validation_request(email, api_key)
         if is_valid_email(api_response):
             valid_emails.append(email)
+
+        time.sleep(1)  # Sleep for 1 second to avoid exceeding the rate limit
 
     if valid_emails:
         print("\nThe following email addresses appear to be valid:")
