@@ -27,8 +27,7 @@ def categorize_email(api_data):
         return "invalid"
 
     deliverability = api_data['deliverability']
-    quality_score = float(api_data['quality_score'])
- # Convert to float
+    quality_score = float(api_data['quality_score']) # Convert to float
     is_valid_format = api_data['is_valid_format']['value']
     is_free_email = api_data['is_free_email']['value']
     is_disposable_email = api_data['is_disposable_email']['value']
