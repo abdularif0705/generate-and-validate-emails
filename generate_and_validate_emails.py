@@ -1,5 +1,5 @@
-import requests
 import json
+import requests
 
 # Function to send a GET request to AbstractAPI for email validation
 def send_email_validation_request(email_address, api_key):
@@ -12,23 +12,25 @@ def send_email_validation_request(email_address, api_key):
         print(f"There was an error contacting the Email Validation API: {api_error}")
         return None
 
-
 # Function to determine if the email is valid based on AbstractAPI response
 def is_valid_email(api_data):
     if api_data is None:
         return False
 
-    is_valid_format = api_data['is_valid_format']['value']
-    is_free_email = api_data['is_free_email']['value']
-    is_disposable_email = api_data['is_disposable_email']['value']
-    is_role_email = api_data['is_role_email']['value']
-    is_mx_found = api_data['is_mx_found']['value']
-    is_smtp_valid = api_data['is_smtp_valid']['value']
+    is_valid_format = api_data.get('is_valid_format', {}).get('value', False)
+    is_free_email = api_data.get('is_free_email', {}).get('value', False)
+    is_disposable_email = api_data.get('is_disposable_email', {}).get('value', False)
+    is_role_email = api_data.get('is_role_email', {}).get('value', False)
+    is_catchall_email = api_data.get('is_catchall_email', {}).get('value', False)
+    is_mx_found = api_data.get('is_mx_found', {}).get('value', False)
+    is_smtp_valid = api_data.get('is_smtp_valid', {}).get('value', False)
 
-    if is_valid_format and is_mx_found and is_smtp_valid:
-        if not (is_free_email or is_disposable_email or is_role_email):
-            return True
+    if (is_valid_format and is_mx_found and is_smtp_valid and
+        not (is_free_email or is_disposable_email or is_role_email or is_catchall_email)):
+        return True
+
     return False
+
 # Generate individual email based on a pattern
 def generate_email(first, last, domain, pattern):
     return pattern.format(first, last, domain)
@@ -52,16 +54,9 @@ def generate_email_variations(first_name, last_name, company_domain):
                             (first_name[0], last_name[0]), (last_name[0], first_name[0])]:
             email_variations.add(generate_email(first, last, company_domain, pattern))
 
-    full_name = first_name + '.' + last_name
-    for i in range(len(full_name), 0, -1):
-        truncated_name = full_name[:i]
-        if '.' in truncated_name:  # Check if '.' exists in truncated_name
-            first, last = truncated_name.split('.')
-            email_variations.add(generate_email(first, last, company_domain, pattern))
-
     return list(email_variations)
 
-
+# Main code block
 if __name__ == "__main__":
     api_key = "YOUR_API_KEY_HERE"  # Replace with your actual API key
 
@@ -72,9 +67,15 @@ if __name__ == "__main__":
     email_variations = generate_email_variations(first_name, last_name, company_domain)
 
     print("\nChecking email address variations for validity...")
+    valid_emails = []
     for email in email_variations:
         api_response = send_email_validation_request(email, api_key)
         if is_valid_email(api_response):
-            print(f"{email} appears to be valid.")
-        else:
-            print(f"{email} appears to be invalid.")
+            valid_emails.append(email)
+
+    if valid_emails:
+        print("\nThe following email addresses appear to be valid:")
+        for email in valid_emails:
+            print(email)
+    else:
+        print("\nNo valid email addresses found.")
