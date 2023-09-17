@@ -20,7 +20,6 @@ def categorize_email(api_data):
     if api_data is None:
         return "invalid"
 
-    # Checking if all the keys we are interested in are in the api_data
     general_keys = ['deliverability', 'quality_score', 'is_valid_format', 'is_free_email', 'is_disposable_email',
                     'is_role_email', 'is_catchall_email', 'is_mx_found', 'is_smtp_valid']
 
@@ -28,7 +27,8 @@ def categorize_email(api_data):
         return "invalid"
 
     deliverability = api_data['deliverability']
-    quality_score = api_data['quality_score']
+    quality_score = float(api_data['quality_score'])
+ # Convert to float
     is_valid_format = api_data['is_valid_format']['value']
     is_free_email = api_data['is_free_email']['value']
     is_disposable_email = api_data['is_disposable_email']['value']
@@ -44,6 +44,7 @@ def categorize_email(api_data):
         else:
             return "flagged"
     return "invalid"
+
 
 # Generate individual email based on a pattern
 def generate_email(first, last, domain, pattern):
